@@ -1,6 +1,6 @@
 from tornado.web import RequestHandler
 
-GLOBAL_CHARSET = 'utf-8'
+GLOBAL_CHARSET = "utf-8"
 
 
 class AsgiHandler(RequestHandler):
@@ -18,7 +18,7 @@ class AsgiHandler(RequestHandler):
         scope = {
             "type": self.request.protocol, "http_version": self.request.version, "path": self.request.path,
             "method": self.request.method, "query_string": self.request.query.encode(GLOBAL_CHARSET),
-            "headers": headers
+            "headers": headers, "client": (self.request.remote_ip, 0)
         }
 
         async def receive():

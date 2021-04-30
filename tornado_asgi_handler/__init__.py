@@ -13,7 +13,8 @@ class AsgiHandler(RequestHandler):
         headers = []
         for k in self.request.headers:
             for v in self.request.headers.get_list(k):
-                headers.append((k.encode(GLOBAL_CHARSET).lower(), v.encode(GLOBAL_CHARSET)))
+                headers.append(
+                    (k.encode(GLOBAL_CHARSET).lower(), v.encode(GLOBAL_CHARSET)))
 
         scope = {
             "type": self.request.protocol, "http_version": self.request.version, "path": self.request.path,
@@ -22,7 +23,7 @@ class AsgiHandler(RequestHandler):
         }
 
         async def receive():
-            return {'body': self.request.body}
+            return {'body': self.request.body, "type": "http.request", "more_body": False}
 
         async def send(data):
             if data['type'] == 'http.response.start':
@@ -32,11 +33,13 @@ class AsgiHandler(RequestHandler):
                 self.clear_header("date")
                 for h in data['headers']:
                     if len(h) == 2:
-                        self.add_header(h[0].decode(GLOBAL_CHARSET), h[1].decode(GLOBAL_CHARSET))
+                        self.add_header(h[0].decode(
+                            GLOBAL_CHARSET), h[1].decode(GLOBAL_CHARSET))
             elif data['type'] == 'http.response.body':
                 self.write(data['body'])
             else:
-                raise RuntimeError(f"Unsupported response type \"{data['type']}\" for asgi app")
+                raise RuntimeError(
+                    f"Unsupported response type \"{data['type']}\" for asgi app")
 
         await self._asgi_app(scope, receive, send)
 

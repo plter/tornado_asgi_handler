@@ -14,12 +14,17 @@ class AsgiHandler(RequestHandler):
         for k in self.request.headers:
             for v in self.request.headers.get_list(k):
                 headers.append(
-                    (k.encode(GLOBAL_CHARSET).lower(), v.encode(GLOBAL_CHARSET)))
+                    (k.encode(GLOBAL_CHARSET).lower(), v.encode(GLOBAL_CHARSET))
+                )
 
         scope = {
-            "type": self.request.protocol, "http_version": self.request.version, "path": self.request.path,
-            "method": self.request.method, "query_string": self.request.query.encode(GLOBAL_CHARSET),
-            "headers": headers, "client": (self.request.remote_ip, 0)
+            "type": self.request.protocol,
+            "http_version": self.request.version,
+            "path": self.request.path,
+            "method": self.request.method,
+            "query_string": self.request.query.encode(GLOBAL_CHARSET),
+            "headers": headers,
+            "client": (self.request.remote_ip, 0)
         }
 
         async def receive():
@@ -33,8 +38,10 @@ class AsgiHandler(RequestHandler):
                 self.clear_header("date")
                 for h in data['headers']:
                     if len(h) == 2:
-                        self.add_header(h[0].decode(
-                            GLOBAL_CHARSET), h[1].decode(GLOBAL_CHARSET))
+                        self.add_header(
+                            h[0].decode(GLOBAL_CHARSET),
+                            h[1].decode(GLOBAL_CHARSET)
+                        )
             elif data['type'] == 'http.response.body':
                 self.write(data['body'])
             else:

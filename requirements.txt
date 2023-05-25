@@ -1,2 +1,2 @@
-tornado==6.0.3
+tornado==6.3.2
 uvicorn==0.11.7
